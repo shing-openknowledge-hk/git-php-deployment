@@ -1,0 +1,27 @@
+{
+	"name": "git-php-deploy",
+	"version": "0.0.0",
+	"author": "",
+	"description": "",
+	"main": "./lib/main.js",
+	"bin": {
+		"git-php-deploy": "./bin/index.js"
+	},
+	"scripts": {
+		"test": "node test/test.js"
+	},
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"gitlog": "^4.0.8",
+		"jsonwebtoken": "^9.0.2",
+		"jszip": "^3.10.1",
+		"mime": "1.6.0",
+		"request": "^2.88.2",
+		"yargs": "^17.7.2"
+	},
+	"keywords": [],
+	"licenses": [],
+	"engines": {
+		"node": ">=18"
+	}
+}

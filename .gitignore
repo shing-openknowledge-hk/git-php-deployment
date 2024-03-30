@@ -1,1 +1,7 @@
 /node_modules
+/server/DEPLOY
+/server/php/autoload/vendor
+/server/php/tmp
+/dist
+*.bat
+/package-lock.json

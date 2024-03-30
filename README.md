@@ -1,3 +1,6 @@
+## requirement NODEJS 18 / PHP 7.3 + composer
+	
+
 ## 1. start a project
 npm init -y
 
@@ -8,15 +11,23 @@ npm install https://github.com/shing-openknowledge-hk/git-php-deployment --save-
 {
 	"DEPLOYMENT_ZIP_FILE":"dist/deployment.zip",
 	"DEPLOYMENT_JWT":"HELLO_WORLD",
-	"DEPLOYMENT_URL":"http://localhost/deploy/"
+	"DEPLOYMENT_URL":"http://localhost:8000/"
 }
-## 4. start php server using sample php 
-	copy sample code to php server
-	
-## 5. check config and connection
+
+## 4. install php dependency
+	goto autoload folder and run composer install
+
+## 5. start php server using sample php 
+	change default config.php MATCH config.json
+	copy sample code to apache server
+
+		or
+	run php sample code directly 
+		php -S localhost:8000 -t ./
+## 6. check config and connection
 	"node_modules/.bin/git-php-deploy" --config config.json --action verify
 	
-## 6. run deployment code
+## 7. run deployment code
 	"node_modules/.bin/git-php-deploy" --config config.json --action deploy
 	
 	

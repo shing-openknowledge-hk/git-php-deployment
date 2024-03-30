@@ -229,6 +229,10 @@ try{
 		$extension = getFileExtension($obj->name);
 		if($extension == "zip")
 		{
+			if (!file_exists($dir)) {
+				mkdir($dir, 0777, true);
+			}
+
 			$result = move_uploaded_file( $tmp, $dir.$name );
 			Responder::json_response(200, [
 				"msg"=>"OK"

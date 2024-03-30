@@ -1,5 +1,7 @@
 const JSZip = require('jszip');
 const fs = require('fs');
+const path = require('path');
+
 const ScanDir = require("./scandir/scandir");
 // const ScanDir = require("./scandir/scandir");
 // console.log(ScanDir);
@@ -9,6 +11,21 @@ utils.merge(["file1.zip", "file2.zip"]).then(()=>{
 	utils.save("merge2.zip");
 });
 */
+class FileSystemUtils
+{
+	
+	static createFolderForFile(file)
+	{
+		const directoryPath = path.dirname(file);
+		if (!fs.existsSync(directoryPath)) {
+			// 如果目录不存在，则创建目录
+			fs.mkdirSync(directoryPath, { recursive: true });
+			console.log(`Directory ${directoryPath} created.`);
+		} else {
+			console.log(`Directory ${directoryPath} already exists.`);
+		}
+	}
+}
 class FileLoader
 {
 	load(file)
@@ -24,10 +41,7 @@ class FileLoader
 			});
 		})
 	}
-	scanDir(folder)
-	{
-		
-	}
+	
 }
 
 class ZipUtils
@@ -169,6 +183,7 @@ class ZipUtils
 	**/
 	save(filename, extraOptions)
 	{
+		FileSystemUtils.createFolderForFile(filename);
 		return new Promise((resolve, reject) => {
 			
 			var option = { type: 'nodebuffer', streamFiles: true };

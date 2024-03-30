@@ -20,6 +20,7 @@ class GitInfo
 		var gitOption = {
 			// branch :"master",
 			repo: __dirname ,
+			includeMergeCommitFiles:true
 			// execOptions: { maxBuffer: 1000 * 1024 },
 			// after:"2024-03-27 16:33:26 +0800"
 		};

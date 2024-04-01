@@ -46,6 +46,10 @@ function run(fn)
 	});
 }
 
+if(!config.SECRET && env.SECRET)
+{
+	config.SECRET = env.SECRET;
+}
 
 if(options.action == "verify")
 {

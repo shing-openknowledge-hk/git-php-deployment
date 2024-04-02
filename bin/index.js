@@ -36,6 +36,7 @@ function getConfig()
 	var configString = fs.readFileSync(options.config);
 	var config = JSON.parse(configString +"");	
 	var output = {};
+	copy(process.env, output);
 	copy(env, output);
 	copy(config, output);
 	return output;

@@ -89,7 +89,6 @@ class ZipDeploy
 		
 		$file_count = $zip->numFiles;
 		$zip_file_path = substr($file_path, 2);
-		// $info = [];
 		for($i = 0; $i < $file_count; $i++) {
 			$filename = $zip->getNameIndex($i);
 			// $ext = getFileExtension($filename);
@@ -155,11 +154,16 @@ function get_header($name)
 }
 try{
 	$dir = $config["TMP_ZIP_FOLDER"];
-	$authorization = get_header("Authorization");
-	if(!$authorization) {
-		throw new Exception("Missing token");
+	if(isset($_REQUEST["jwt"]))
+	{
+		$jwt = $_REQUEST["jwt"];
+	} else {
+		$authorization = get_header("Authorization");
+		if(!$authorization) {
+			throw new Exception("Missing token");
+		}
+		$jwt = str_replace("Bearer ", "", $authorization);
 	}
-	$jwt = str_replace("Bearer ", "", $authorization);
 	JWTTool::verify($config["SECRET"], $jwt);
 	
 	
@@ -177,7 +181,7 @@ try{
 	{
 		Responder::json_response(
 			200, 
-			["message"=>"OK"]
+			["msg"=>"OK"]
 		);
 	} else if($action == "deploy_status")
 	{
@@ -206,9 +210,6 @@ try{
 			$dir. $config["ZIP_FILE"], 
 			$target_path
 		);
-		
-		// if(file_exists($target_path)) rename($target_path, "pending_del");
-		// rename("temp", $target_path);
 		
 		Responder::json_response(200, [
 			"time"=>time() + 30,

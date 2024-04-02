@@ -23,10 +23,22 @@ var env = options.e ? dotenv.config({path:options.e}).parsed : dotenv.config().p
 
 
 var tool = new DeployTool();
+function copy(from, to)
+{
+	for(var key in from)
+	{
+		to[key] = from[key];
+	}
+}
+
 function getConfig()
 {
-	var config = fs.readFileSync(options.config);
-	return JSON.parse(config +"");	
+	var configString = fs.readFileSync(options.config);
+	var config = JSON.parse(configString +"");	
+	var output = {};
+	copy(env, output);
+	copy(config, output);
+	return output;
 }
 function run(fn)
 {
@@ -46,10 +58,12 @@ function run(fn)
 	});
 }
 
+/*
 if(!config.SECRET && env.SECRET)
 {
 	config.SECRET = env.SECRET;
 }
+*/
 
 if(options.action == "verify")
 {

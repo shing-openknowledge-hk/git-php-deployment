@@ -226,6 +226,13 @@ try{
 		$obj=(object)$_FILES['file'];
         $name = $config["ZIP_FILE"];
 		$tmp=$obj->tmp_name;
+		if($obj->size <= 0)
+		{
+			Responder::json_response(400, [
+				"msg"=>"0 file size upload filed"
+			]);
+		}
+		
 		$extension = getFileExtension($obj->name);
 		if($extension == "zip")
 		{

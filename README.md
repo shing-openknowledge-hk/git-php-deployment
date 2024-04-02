@@ -9,9 +9,15 @@ npm install https://github.com/shing-openknowledge-hk/git-php-deployment --save-
 
 ## 3. create config.json file
 {
-	"DEPLOYMENT_ZIP_FILE":"dist/deployment.zip",
-	"DEPLOYMENT_JWT":"HELLO_WORLD",
-	"DEPLOYMENT_URL":"http://localhost:8000/"
+	"URL":"http://localhost:8000/",
+	"ZIP_FILE":"dist/deployment.zip",
+	"SECRET":"HELLO_WORLD",
+	"REPOSITORY":"./",
+	"SYNC":[
+		"application/controllers/",
+		"application/libraries/",
+		"application/ro_library/"
+	]
 }
 
 ## 4. install php dependency

@@ -41,10 +41,26 @@ npm install https://github.com/shing-openknowledge-hk/git-php-deployment --save-
 
 ```
 
+方法一 Directly Call Command
 ## 6. check config and connection
 	"node_modules/.bin/git-php-deploy" --config config.json --action verify
 	
 ## 7. run deployment code
 	"node_modules/.bin/git-php-deploy" --config config.json --action deploy
+方法二
+##6 using package.json
+modify package.json
+```
+{
+	"script":{
+		"verify":"npx git-php-deploy --config config.json --action verify",
+		"deploy":"npx git-php-deploy --config config.json --action deploy"
+	}
+}
+run verify command
+	npm run verify
+run deploy command
+	npm run deploy
+```
 	
 	

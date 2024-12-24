@@ -10,10 +10,29 @@ npm install https://github.com/shing-openknowledge-hk/git-php-deployment --save-
 ## 3. create config.json file
 ```
 {
+	"TYPE":"PHP",
 	"URL":"http://localhost:8000/",
 	"ZIP_FILE":"dist/deployment.zip",
 	"SECRET":"HELLO_WORLD",
-	"REPOSITORY":"./",
+	"REPOSITORY":"../git/",
+	"SYNC":[
+		"application/controllers/",
+		"application/libraries/",
+		"application/ro_library/"
+	]
+}
+OR
+{
+	"TYPE":"FTP",
+	"ACCOUNT":{
+		"host":"",
+		"username":"",
+		"password":""
+	},
+	"URL":"http://localhost:8000/",
+	"ZIP_FILE":"dist/deployment.zip",
+	"SECRET":"HELLO_WORLD",
+	"REPOSITORY":"../git/",
 	"SYNC":[
 		"application/controllers/",
 		"application/libraries/",

@@ -1,4 +1,5 @@
 {
+	"TYPE":"PHP",
 	"URL":"http://localhost:8000/",
 	"ZIP_FILE":"dist/deployment.zip",
 	"SECRET":"HELLO_WORLD",

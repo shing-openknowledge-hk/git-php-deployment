@@ -4,12 +4,13 @@
 		"host":"ftp.server.com",
 		"port":21,
 		"user":"username",
-		"password":"password"
+		"password":"password",
+		"root":"/site/wwwroot"
 	},
-	"URL":"http://localhost:8000/",
-	"ZIP_FILE":"dist/deployment.zip",
-	"SECRET":"HELLO_WORLD",
-	"REPOSITORY":"../git/",
+	"GIT":{
+		"path":"R:/git.checkout/",
+		"branch":"uat"
+	},
 	"SYNC":[
 		"application/controllers/",
 		"application/libraries/",

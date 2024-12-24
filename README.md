@@ -26,13 +26,15 @@ OR
 	"TYPE":"FTP",
 	"ACCOUNT":{
 		"host":"",
-		"username":"",
-		"password":""
+		"port":21,
+		"user":"",
+		"password":"",
+		"root":"/site/wwwroot"
 	},
-	"URL":"http://localhost:8000/",
-	"ZIP_FILE":"dist/deployment.zip",
-	"SECRET":"HELLO_WORLD",
-	"REPOSITORY":"../git/",
+	"GIT":{
+		"path":"R:/git.checkout/",
+		"branch":"uat"
+	},
 	"SYNC":[
 		"application/controllers/",
 		"application/libraries/",

@@ -73,7 +73,29 @@ if(options.action == "verify")
 		return await tool.verifyConfig(config);
 		// return await tool.verify(config.URL, config.SECRET);
 	});
-
+} else if(options.action == "init")
+{
+	run(async ()=>{
+		var config = getConfig();
+		var gitInfo = new GitInfo();
+		if(config.TYPE == "FTP")
+		{
+			// var jsonPath = "/git_status.json";
+			// options = await tool.getFTPDeploymentInfo(config.ACCOUNT, jsonPath);
+			var latestCommit = gitInfo.getLastestCommit();
+			if(latestCommit)
+			{
+				delete latestCommit.files;
+				delete latestCommit.status;
+				console.info("latestCommit", latestCommit)
+				console.info("writing git_status.json to server");
+				await tool.save_summarize(config.ACCOUNT, {latest:latestCommit}, "/git_status.json");
+			} else {
+				console.error("no commit is found");
+			}
+		};
+		return "init COMPLETED";
+	});
 } else if(options.action == "deploy")
 {
 	run(async ()=>{
@@ -98,28 +120,26 @@ if(options.action == "verify")
 				config.SYNC,
 				latestHash
 			);
-
-			var deploymentInfo = info.latest ? {latest:info.latest} : null;
-			if(await tool.summarize(info))
+			if(options)
 			{
-				await tool.uploadChanges(
-					config.ACCOUNT,
-					config.GIT,
-					info
-				);
-			} else {
-				console.log("\tAlready up to date.");
-				// console.log("nothing has changed") ;
-			}
-			try{
-				delete info.deleted;
-				delete info.changed;
-				delete info.latest.files;
-				delete info.latest.status;
-				await tool.save_summarize(config.ACCOUNT, info, "/git_status.json");
-			} catch(err)
-			{
-				console.log(err);
+				var deploymentInfo = info.latest ? {latest:info.latest} : null;
+				if(await tool.summarize(info))
+				{
+					await tool.uploadChanges(config.ACCOUNT, config.GIT, info );
+				} else {
+					console.log("\tAlready up to date.");
+					// console.log("nothing has changed") ;
+				}
+				try{
+					delete info.deleted;
+					delete info.changed;
+					delete info.latest.files;
+					delete info.latest.status;
+					await tool.save_summarize(config.ACCOUNT, info, "/git_status.json");
+				} catch(err)
+				{
+					console.log(err);
+				}
 			}
 		} else if(config.TYPE == "PHP")
 		{

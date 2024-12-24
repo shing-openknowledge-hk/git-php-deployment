@@ -73,7 +73,7 @@ class FTPClient
 
 	async upload_json(json, path)
 	{
-		return await this.upload_text_content(JSON.stringify(json), path);
+		return await this.upload_text_content(JSON.stringify(json, null, "\t"), path);
 	}
 
 	stringToStream(text) {

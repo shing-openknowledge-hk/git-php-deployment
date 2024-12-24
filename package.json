@@ -9,6 +9,7 @@
 	},
 	"scripts": {
 		"verify": "node bin/index.js --config sample.config.json --action verify",
+		"init": "node bin/index.js --config sample.config.json --action init",
 		"deploy": "node bin/index.js --config sample.config.json --action deploy"
 	},
 	"dependencies": {

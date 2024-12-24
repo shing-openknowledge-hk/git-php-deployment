@@ -14,7 +14,17 @@ class GitInfo
 			return index === 0;
 		}).length > 0;
 	}
-	
+	getLastestCommit()
+	{
+		var gitOption = {
+			number:1,
+			repo: __dirname,
+			includeMergeCommitFiles:true
+		};
+		var commits = gitlog(gitOption);
+		if(commits.length ) return commits[0];
+		return null;
+	}
 	getCommitInfo(option, includedPaths, hash = null)
 	{
 		var gitOption = {

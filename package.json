@@ -8,10 +8,12 @@
 		"git-php-deploy": "./bin/index.js"
 	},
 	"scripts": {
-		"test": "node test/test.js"
+		"verify": "node bin/index.js --config sample.config.json --action verify",
+		"deploy": "node bin/index.js --config sample.config.json --action deploy"
 	},
 	"dependencies": {
-		"dotenv": "^16.4.5",
+		"dotenv": "^16.4.7",
+		"ftp": "^0.3.10",
 		"gitlog": "^4.0.8",
 		"jsonwebtoken": "^9.0.2",
 		"jszip": "^3.10.1",

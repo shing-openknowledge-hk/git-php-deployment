@@ -70,53 +70,100 @@ if(options.action == "verify")
 {
 	run(async ()=>{
 		var config = getConfig();
-		return await tool.verify(config.URL, config.SECRET);
+		return await tool.verifyConfig(config);
+		// return await tool.verify(config.URL, config.SECRET);
 	});
+
 } else if(options.action == "deploy")
 {
 	run(async ()=>{
 		var config = getConfig();
 		
 		var gitInfo = new GitInfo();
-		
-		var options = await tool.getDeploymentInfo(
-			config.SECRET, 
-			config.URL
-		);
-		console.log("server status", options);
-		var gitFilter = options ? {after:options.latest.authorDate} : {};
-		gitFilter.repo = config.REPOSITORY;
-		
-		var info = gitInfo.getCommitInfo(
-			gitFilter, 
-			config.SYNC
-		);
-		console.log("changes", info);
-		console.log("zip files now");
-		var deploymentInfo = info.latest ? {latest:info.latest} : null;
-		var flag = await tool.zip(deploymentInfo, info, config.ZIP_FILE);
-		if(!flag) {
-			// console.log("not changes");
-			return "not has changed";
-		}
-		if(options && options.latest && deploymentInfo.latest &&
-			options.latest.hash == deploymentInfo.latest.hash &&
-			options.latest.authorDate == deploymentInfo.latest.authorDate
-		)
+		var options;
+		if(config.TYPE == "FTP")
 		{
-			return "same commit";
+			var jsonPath = "/git_status.json";
+			options = await tool.getFTPDeploymentInfo(
+				config.ACCOUNT, 
+				jsonPath
+			);
+			var latestHash = options && options.latest ? options.latest.hash : null;
+			var gitFilter = options && options.latest ? {after:options.latest.authorDate} : {};
+			gitFilter.repo = config.GIT.path;
+			gitFilter.branch = config.GIT.branch;
+			
+			var info = gitInfo.getCommitInfo(
+				gitFilter, 
+				config.SYNC,
+				latestHash
+			);
+
+			var deploymentInfo = info.latest ? {latest:info.latest} : null;
+			if(await tool.summarize(info))
+			{
+				await tool.uploadChanges(
+					config.ACCOUNT,
+					config.GIT,
+					info
+				);
+			} else {
+				console.log("\tAlready up to date.");
+				// console.log("nothing has changed") ;
+			}
+			try{
+				delete info.deleted;
+				delete info.changed;
+				delete info.latest.files;
+				delete info.latest.status;
+				await tool.save_summarize(config.ACCOUNT, info, "/git_status.json");
+			} catch(err)
+			{
+				console.log(err);
+			}
+		} else if(config.TYPE == "PHP")
+		{
+			options = await tool.getDeploymentInfo(
+				config.SECRET, 
+				config.URL
+			);
+			console.log("server status", options);
+			var gitFilter = options && options.latest ? {after:options.latest.authorDate} : {};
+			gitFilter.repo = config.REPOSITORY;
+			
+			var info = gitInfo.getCommitInfo(
+				gitFilter, 
+				config.SYNC
+			);
+			// console.log("changes", info);
+			console.log("zip files now");
+			var deploymentInfo = info.latest ? {latest:info.latest} : null;
+			var flag = await tool.zip(deploymentInfo, info, config.ZIP_FILE);
+			if(!flag) {
+				// console.log("not changes");
+				return "not has changed";
+			}
+			if(options && options.latest && deploymentInfo.latest &&
+				options.latest.hash == deploymentInfo.latest.hash &&
+				options.latest.authorDate == deploymentInfo.latest.authorDate
+			)
+			{
+				return "same commit";
+			}
+			// console.log("upload now");
+			info = await tool.upload(
+				config.SECRET, 
+				config.URL, 
+				config.ZIP_FILE
+			);
+			
+			// console.log("upload result", info);
+			
+			info = await tool.deploy(config.SECRET, config.URL);
+			// console.log("deploy result", info);
+			return "completed";
 		}
-		console.log("upload now");
-		info = await tool.upload(
-			config.SECRET, 
-			config.URL, 
-			config.ZIP_FILE
-		);
+		return false;
 		
-		console.log("upload result", info);
-		
-		info = await tool.deploy(config.SECRET, config.URL);
-		console.log("deploy result", info);
-		return "completed";
 	});
 }

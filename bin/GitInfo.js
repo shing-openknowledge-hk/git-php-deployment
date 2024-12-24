@@ -15,7 +15,7 @@ class GitInfo
 		}).length > 0;
 	}
 	
-	getCommitInfo(option, includedPaths)
+	getCommitInfo(option, includedPaths, hash = null)
 	{
 		var gitOption = {
 			// branch :"master",
@@ -31,27 +31,32 @@ class GitInfo
 				gitOption[key] = option[key];
 			}
 		}
+		// console.log("gitOption", gitOption)
 		var commits = gitlog(gitOption);
 		var deletedFiles = [];
 		var changedFiles = [];
 		var map = {};
-		commits.forEach((commit)=>{
-			commit.files.forEach((file, index)=>{
-				if(this.match.call(null, file, includedPaths) == false) return;
-				if(map.hasOwnProperty(file))
-				{
-					return;
-				}
-				map[file] = 1;
-				var status = commit.status[index];
-				if(status == "A" || status == "M")
-				{// Append // Modify
-					changedFiles.push(file);
-				} else if(status == "D")
-				{// Delete
-					deletedFiles.push(file);
-				}
-			});
+		commits.forEach((commit, index)=>{
+			// console.log("commit", index, commit);
+			if(commit.hash !== hash)
+			{
+				commit.files.forEach((file, index)=>{
+					if(this.match.call(null, file, includedPaths) == false) return;
+					if(map.hasOwnProperty(file))
+					{
+						return;
+					}
+					map[file] = 1;
+					var status = commit.status[index];
+					if(status == "A" || status == "M")
+					{// Append // Modify
+						changedFiles.push(file);
+					} else if(status == "D")
+					{// Delete
+						deletedFiles.push(file);
+					}
+				});
+			}
 		});
 		var now = new Date().toISOString();
 		return {

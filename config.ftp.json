@@ -1,9 +1,10 @@
 {
 	"TYPE":"FTP",
 	"ACCOUNT":{
-		"host":"",
-		"username":"",
-		"password":""
+		"host":"ftp.server.com",
+		"port":21,
+		"user":"username",
+		"password":"password"
 	},
 	"URL":"http://localhost:8000/",
 	"ZIP_FILE":"dist/deployment.zip",

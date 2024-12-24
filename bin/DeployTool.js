@@ -1,7 +1,9 @@
+const PATH = require('path');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const ZipUtils = require('./ZipUtils');
 var request = require('request');
+const FTPClient = require('./FTPClient');
 module.exports = class DeployTool{
 	constructor()
 	{
@@ -10,11 +12,32 @@ module.exports = class DeployTool{
 		// this.path = env.path;
 		// this.secretKey = secretKey;
 	}
-	async curl()
+	
+	async verifyConfig(config)
 	{
-		
+		if(config.TYPE == "FTP")
+		{
+			return this.verifyFTP(config.ACCOUNT);
+		} else if(config.TYPE == "PHP")
+		{
+			return this.verifyPHP(config.URL, config.SECRET);
+		}
+		return true;
 	}
-	async verify(url, secretKey)
+
+	async verifyFTP(account)
+	{
+		if(!(account && account.host && account.port && account.user && account.password))
+		{
+			throw( new Error("401 missing account info")   );
+		};
+		console.log(account.host, account.port, account.user);
+		var client = new FTPClient(account);
+		await client.verify();
+		return true;
+	}
+
+	async verifyPHP(url, secretKey)
 	{
 		var token = this.sign(secretKey, "verify");
 		const response = await fetch(url +"?action=verify", {
@@ -40,7 +63,107 @@ module.exports = class DeployTool{
 			throw( new Exception(text) );
 		}
 	}
+
+	async save_summarize(account, info, path)
+	{
+		var client = new FTPClient(account);
+		await client.connect();
+		try{
+			await client.upload_json(info, path);
+		} catch(err)
+		{
+			console.log(err);
+		}
+		await client.close();
+	}
+
+	summarize(info)
+	{
+		if(!(info.deleted.length || info.changed.length))
+		{
+			return false;
+		}
+		
+		var count = 0;
+		for(var i = 0;i < info.changed.length;i++)
+		{
+			var file = info.changed[i];
+			count ++;
+		}
+		for(var i = 0;i < info.deleted.length;i++)
+		{
+			var file = info.deleted[i];
+			count++;
+		}
+		return count > 0;
+	}
+	unique(arr) {
+		return [...new Set(arr)];
+	}
 	
+	async uploadChanges(account, gitInfo, info)
+	{
+		var client = new FTPClient(account);
+		await client.connect();
+		var localRoot = gitInfo.path;
+		var folders = [];
+		// getFolders
+		// console.log("check folders");
+		for(var i = 0;i < info.changed.length;i++)
+		{
+			var file = info.changed[i];
+			var localFile = localRoot+file;
+			var serverFile = "/"+file;
+			folders.push(PATH.dirname(serverFile));
+		}
+		folders = this.unique(folders);
+		if(folders.length)
+		{
+			// console.log("creating folders");
+			for(var i = 0;i < folders.length;i++)
+			{
+				var folder = folders[i];
+				console.log("\t+", folder);
+				await client.mkdir(folder);
+			}
+		}
+		// console.log("updating contents");
+		for(var i = 0;i < info.changed.length;i++)
+		{
+			var file = info.changed[i];
+			var localFile = localRoot+file;
+			var serverFile = "/"+file;
+			console.log("\t+", serverFile);
+			await client.upload(localFile, serverFile);
+		}
+		
+		for(var i = 0;i < info.deleted.length;i++)
+		{
+			var file = info.deleted[i];
+			var serverFile = "/"+file;
+			console.log("\t-", serverFile);
+			try{
+				await client.remove(serverFile);
+			} catch(err)
+			{
+				if(err.name == "Error" && err.code == 550)
+				{
+					// console.error(path, "file not found");
+				} else {
+					console.error("remove error",{
+						name:err.name,
+						code:err.code,
+						message:err.message
+					});
+				}
+			}
+			
+		}
+		
+		client.close();
+		return true;
+	}
+
 	async zip(deploymentInfo, info, path)
 	{
 		if(!(info.deleted.length || info.changed.length))
@@ -67,7 +190,40 @@ module.exports = class DeployTool{
 		await zip.save(path);
 		return true;
 	}
+
+	async getFTPDeploymentInfo(account, path)
+	{
+		var client = new FTPClient(account);
+		await client.connect();
+		try{
+			var output = await client.get_json_file(path)
+		} catch(err)
+		{
+			if(err.name == "Error" && err.code == 550)
+			{
+				console.error(path, "file not found");
+			} else {
+				console.error({
+					name:err.name,
+					code:err.code,
+					message:err.message
+				});
+			}
+			
+			// console.log(err.code);
+			output = null;
+		}
+		await client.close();
+		return output;
+	}
 	
+	async getFTPFile(account, path)
+	{
+		var client = new FTPClient(account);
+		await client.connect();
+		await client.close();
+	}
+
 	async getDeploymentInfo(secretKey, url)
 	{
 		var token = this.sign(secretKey, "deploy_status");

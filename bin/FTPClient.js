@@ -94,11 +94,11 @@ class FTPClient
 			// console.log("buffer", buffer);
 			// console.log("uploading text content", fullPath, content);
 			// this.client.put("./sample.json", fullPath, (err, a)=>{
-			this.client.put(buffer, fullPath, (err, a)=>{
+			this.client.put(buffer, fullPath, (err)=>{
 				// console.log("response", err, a);
 				if (err) {
 					reject(err);
-					throw err;
+					// throw err;
 				} else {
 					resolve();
 				}

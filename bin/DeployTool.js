@@ -72,7 +72,7 @@ module.exports = class DeployTool{
 			await client.upload_json(info, path);
 		} catch(err)
 		{
-			throw(new Error("failed to save summary");
+			throw(new Error("failed to save summary"));
 		}
 		await client.close();
 	}

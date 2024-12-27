@@ -1,11 +1,11 @@
 {
-	"name": "git-php-deploy",
+	"name": "git-php-deployment",
 	"version": "0.0.0",
 	"author": "",
 	"description": "",
 	"main": "./lib/main.js",
 	"bin": {
-		"git-php-deploy": "./bin/index.js"
+		"git-php-deployment": "./bin/index.js"
 	},
 	"scripts": {
 		"verify": "node bin/index.js --config sample.config.json --action verify",

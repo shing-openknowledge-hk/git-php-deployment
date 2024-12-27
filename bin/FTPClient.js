@@ -84,24 +84,12 @@ class FTPClient
 	}
 	upload_text_content(content, path)
 	{
-		
 		var fullPath = this.get_full_path(path);
-		// fs.writeFileSync("sample.json", content);
-		// return this.upload("sample.json", fullPath);
 		return new Promise((resolve, reject)=>{
-			// var stream = this.stringToStream(content);
 			var buffer = Buffer.from(content, "utf-8");
-			// console.log("buffer", buffer);
-			// console.log("uploading text content", fullPath, content);
-			// this.client.put("./sample.json", fullPath, (err, a)=>{
 			this.client.put(buffer, fullPath, (err)=>{
-				// console.log("response", err, a);
-				if (err) {
-					reject(err);
-					// throw err;
-				} else {
-					resolve();
-				}
+				if (err) reject(err);
+				else resolve();
 			});
 		});
 	}

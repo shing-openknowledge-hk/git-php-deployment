@@ -88,13 +88,8 @@ if(options.action == "verify")
 				delete latestCommit.files;
 				delete latestCommit.status;
 				console.info("latestCommit", latestCommit)
-				console.info("writing git_status.json to server");
-				try{
-					await tool.save_summarize(config.ACCOUNT, {latest:latestCommit}, "/git_status.json");
-				} catch(reason)
-				{
-					console.error("failed to save summary");
-				}
+				console.info("writing summary(git_status.json) to server ");
+				await tool.save_summarize(config.ACCOUNT, {latest:latestCommit}, "/git_status.json");
 			} else {
 				console.error("no commit is found");
 			}

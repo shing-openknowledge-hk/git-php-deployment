@@ -32,8 +32,7 @@ OR
 		"root":"/site/wwwroot"
 	},
 	"GIT":{
-		"path":"R:/git.checkout/",
-		"branch":"uat"
+		"path":"R:/git.checkout/"
 	},
 	"SYNC":[
 		"application/controllers/",
@@ -65,19 +64,29 @@ OR
 方法一 Directly Call Command
 ## 6. check config and connection
 	"node_modules/.bin/git-php-deploy" --config config.json --action verify
+	npx https://github.com/shing-openknowledge-hk/git-php-deployment --config config.json --action verify
+
+## 7. init git status
+	"node_modules/.bin/git-php-deploy" --config config.json --action init
+	npx https://github.com/shing-openknowledge-hk/git-php-deployment --config config.json --action init
+
 	
-## 7. run deployment code
+## 8. run deployment code
 	"node_modules/.bin/git-php-deploy" --config config.json --action deploy
+	npx https://github.com/shing-openknowledge-hk/git-php-deployment --config config.json --action deploy
 方法二
 ##6 using package.json
 modify package.json
 ```
 {
 	"script":{
+		"init":"npx git-php-deploy --config config.json --action init",
 		"verify":"npx git-php-deploy --config config.json --action verify",
 		"deploy":"npx git-php-deploy --config config.json --action deploy"
 	}
 }
+run verify command
+	npm run init
 run verify command
 	npm run verify
 run deploy command

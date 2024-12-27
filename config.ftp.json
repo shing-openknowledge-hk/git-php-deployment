@@ -8,8 +8,7 @@
 		"root":"/site/wwwroot"
 	},
 	"GIT":{
-		"path":"R:/git.checkout/",
-		"branch":"uat"
+		"path":"R:/git.checkout/"
 	},
 	"SYNC":[
 		"application/controllers/",

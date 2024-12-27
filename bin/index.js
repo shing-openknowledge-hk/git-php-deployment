@@ -113,7 +113,7 @@ if(options.action == "verify")
 			var latestHash = options && options.latest ? options.latest.hash : null;
 			var gitFilter = options && options.latest ? {after:options.latest.authorDate} : {};
 			gitFilter.repo = config.GIT.path;
-			gitFilter.branch = config.GIT.branch;
+			// gitFilter.branch = config.GIT.branch;
 			
 			var info = gitInfo.getCommitInfo(
 				gitFilter, 

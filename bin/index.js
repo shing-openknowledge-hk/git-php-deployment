@@ -77,12 +77,12 @@ if(options.action == "verify")
 {
 	run(async ()=>{
 		var config = getConfig();
-		var gitInfo = new GitInfo();
+		var gitInfo = new GitInfo(config.GIT.path);
 		if(config.TYPE == "FTP")
 		{
 			// var jsonPath = "/git_status.json";
 			// options = await tool.getFTPDeploymentInfo(config.ACCOUNT, jsonPath);
-			var latestCommit = gitInfo.getLastestCommit();
+			var latestCommit = await gitInfo.getLastestCommit();
 			if(latestCommit)
 			{
 				delete latestCommit.files;
@@ -112,7 +112,7 @@ if(options.action == "verify")
 			);
 			var latestHash = options && options.latest ? options.latest.hash : null;
 			var gitFilter = options && options.latest ? {after:options.latest.authorDate} : {};
-			gitFilter.repo = config.GIT.path;
+			// gitFilter.repo = config.GIT.path;
 			// gitFilter.branch = config.GIT.branch;
 			
 			var info = gitInfo.getCommitInfo(

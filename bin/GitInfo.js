@@ -3,8 +3,10 @@ const gitlog = require("./gitlog.js").default;
 
 class GitInfo
 {
-	constructor()
+	repo = null;
+	constructor(repo = null)
 	{
+		this.repo = repo;
 	}
 	
 	match(path, includedPaths)
@@ -15,14 +17,14 @@ class GitInfo
 			return index === 0;
 		}).length > 0;
 	}
-	getLastestCommit()
+	async getLastestCommit()
 	{
 		var gitOption = {
 			number:1,
-			repo: __dirname,
+			repo: this.repo ? this.repo : __dirname ,
 			includeMergeCommitFiles:true
 		};
-		var commits = gitlog(gitOption);
+		var commits = await gitlog(gitOption);
 		if(commits.length ) return commits[0];
 		return null;
 	}
@@ -30,7 +32,7 @@ class GitInfo
 	{
 		var gitOption = {
 			// branch :"master",
-			repo: __dirname ,
+			repo: this.repo ? this.repo : __dirname ,
 			includeMergeCommitFiles:true
 			// execOptions: { maxBuffer: 1000 * 1024 },
 			// after:"2024-03-27 16:33:26 +0800"

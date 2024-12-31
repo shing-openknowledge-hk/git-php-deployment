@@ -1,4 +1,5 @@
-const gitlog = require("gitlog").default;
+// const gitlog = require("gitlog").default;
+const gitlog = require("./gitlog.js").default;
 
 class GitInfo
 {

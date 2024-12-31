@@ -28,7 +28,7 @@ class GitInfo
 		if(commits.length ) return commits[0];
 		return null;
 	}
-	getCommitInfo(option, includedPaths, hash = null)
+	async getCommitInfo(option, includedPaths, hash = null)
 	{
 		var gitOption = {
 			// branch :"master",
@@ -45,7 +45,7 @@ class GitInfo
 			}
 		}
 		// console.log("gitOption", gitOption)
-		var commits = gitlog(gitOption);
+		var commits = await gitlog(gitOption);
 		var deletedFiles = [];
 		var changedFiles = [];
 		var map = {};

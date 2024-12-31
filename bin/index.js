@@ -115,7 +115,7 @@ if(options.action == "verify")
 			// gitFilter.repo = config.GIT.path;
 			// gitFilter.branch = config.GIT.branch;
 			
-			var info = gitInfo.getCommitInfo(
+			var info = await gitInfo.getCommitInfo(
 				gitFilter, 
 				config.SYNC,
 				latestHash
@@ -151,7 +151,7 @@ if(options.action == "verify")
 			var gitFilter = options && options.latest ? {after:options.latest.authorDate} : {};
 			gitFilter.repo = config.REPOSITORY;
 			
-			var info = gitInfo.getCommitInfo(
+			var info = await gitInfo.getCommitInfo(
 				gitFilter, 
 				config.SYNC
 			);

@@ -101,7 +101,7 @@ if(options.action == "verify")
 	run(async ()=>{
 		var config = getConfig();
 		
-		var gitInfo = new GitInfo();
+		var gitInfo = new GitInfo(config.GIT.path);
 		var options;
 		if(config.TYPE == "FTP")
 		{

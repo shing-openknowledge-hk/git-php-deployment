@@ -117,7 +117,7 @@ if(options.action == "verify")
 		);
 		// fileSyntaxCheck("./", ["files/a.js", "files/b.ts", "files/c.json"]);
 		fileSyntaxCheck(gitInfo.repo, info.changed);
-		return true;
+		return "Completed";
 	});
 
 
@@ -143,7 +143,7 @@ if(options.action == "verify")
 		);
 		var localRoot = config.GIT.path;
 		if(info) fileSyntaxCheck(localRoot, info.changed);
-		return true;
+		return "Completed";
 	});
 
 } else if(options.action == "deploy")
@@ -191,6 +191,7 @@ if(options.action == "verify")
 					console.log(err);
 				}
 			}
+			return "completed";
 		} else if(config.TYPE == "PHP")
 		{
 			options = await tool.getDeploymentInfo(
@@ -233,7 +234,7 @@ if(options.action == "verify")
 			// console.log("deploy result", info);
 			return "completed";
 		}
-		return false;
+		return true;
 		
 	});
 } else {

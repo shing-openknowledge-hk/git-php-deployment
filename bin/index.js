@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 const { exit, stdout, stderr, emitWarning } = require('node:process');
+const { execSync } = require("child_process");
 const fs = require("fs");
+const path = require("path");
+
 var dotenv = require('dotenv');
 const yargs = require("yargs");
 var DeployTool = require("./DeployTool");
@@ -33,8 +36,13 @@ function copy(from, to)
 
 function getConfig()
 {
-	var configString = fs.readFileSync(options.config);
-	var config = JSON.parse(configString +"");	
+	if(options.config)
+	{
+		var configString = fs.readFileSync(options.config);
+		var config = JSON.parse(configString +"");	
+	} else {
+		var config = {GIT:{path:"./"}};	
+	}
 	var output = {};
 	copy(process.env, output);
 	copy(env, output);
@@ -96,6 +104,46 @@ if(options.action == "verify")
 		};
 		return "init COMPLETED";
 	});
+} else if(options.action == "test")
+{
+	run(async ()=>{
+		var config = getConfig();
+		var gitInfo = new GitInfo(config.GIT.path);
+		var info = await gitInfo.getCommitInfo(
+			{
+				after:"2026-03-10 11:35:31 +0800"
+			}, 
+			config.SYNC,
+		);
+		// fileSyntaxCheck("./", ["files/a.js", "files/b.ts", "files/c.json"]);
+		fileSyntaxCheck(gitInfo.repo, info.changed);
+		return true;
+	});
+
+
+} else if(options.action == "syntax_check")
+{
+	run(async ()=>{
+		var config = getConfig();
+		var gitInfo = new GitInfo(config.GIT.path);
+		var options;
+		
+		var jsonPath = "/git_status.json";
+		options = await tool.getFTPDeploymentInfo(
+			config.ACCOUNT, 
+			jsonPath
+		);
+		var latestHash = options && options.latest ? options.latest.hash : null;
+		var gitFilter = options && options.latest ? {after:options.latest.authorDate} : {};
+
+		var info = await gitInfo.getCommitInfo(
+			gitFilter, 
+			config.SYNC,
+			latestHash
+		);
+		if(info) fileSyntaxCheck(localRoot, info.changed);
+	});
+
 } else if(options.action == "deploy")
 {
 	run(async ()=>{
@@ -186,4 +234,132 @@ if(options.action == "verify")
 		return false;
 		
 	});
+} else {
+	console.error("unhandled action", JSON.stringify(options.action));
+	exit(1);
+}
+function fileSyntaxCheck(localRoot, files)
+{
+	for(var i = 0;i < files.length;i++)
+	{
+		var file = files[i];
+		var localFile = localRoot+file;
+		var ext = path.extname(localFile);
+		ext =  ext ? ext.toLowerCase() :"";
+		var flag;
+		if(!fs.existsSync(localFile))
+		{
+			throw `${localFile} - File NOT found - ❌`;
+		}
+		if(ext == ".json")
+		{
+			flag = jsonSyntaxCheck(localFile);
+		} else if (ext === ".php")
+		{
+			// console.log(localFile);
+			flag = phpSyntaxCheck(localFile);
+		} else if(ext === ".ts")
+		{
+			flag = tsSyntaxCheck(localFile);
+		} else if(ext == ".js")
+		{
+			flag = jsSyntaxCheck(localFile);
+		} else {
+			flag = true;
+		}
+		if(!flag)
+		{
+			throw `syntax check failed ${localFile} - ❌`;
+		}
+	}
+}
+
+function jsonSyntaxCheck(file) {
+    var filename = path.basename(file);
+    
+    try {
+        // Read the file content
+        let content = fs.readFileSync(file, 'utf8');
+		if(!content)
+		{
+			console.log(`${filename} - empty file - ❌`);
+			return false;
+		}
+		
+		content = content.replace(/\r/g, "\n");
+		content = content.replace(/^\s*[\r\n]+/gm, "");
+		content = content.replace(/\t/g, " ");
+	
+		try{
+			JSON.parse(content);
+		} catch(err)
+		{
+			console.log(`${filename} - ❌`);
+			// Optional: Show line number and position of error
+			const match = err.message.match(/at position (\d+)/);
+			if (match) {
+				const position = parseInt(match[1]);
+				const lines = content.substring(0, position).split('\n');
+				const lineNumber = lines.length;
+				const columnNumber = lines[lines.length - 1].length + 1;
+				const allLines = content.split('\n');
+				const errorLine = allLines[lineNumber - 1];
+				console.log(`  ${errorLine}`);
+				console.log(`  ${' '.repeat(columnNumber - 1)}^`);
+			}
+			
+			return false;
+		}
+        
+        console.log(`${filename} - ✅`);
+        return true;
+    } catch (err) {
+        // Output the error with details
+        console.log(`${filename} - ❌`);
+        console.log(`  Error: ${err.message}`);
+        
+        
+        
+        return false;
+    }
+}
+function phpSyntaxCheck(file)
+{
+	var filename = path.basename(file);
+	try {
+		execSync(`php -l "${file}"`, { stdio: "pipe" }); // capture output
+		console.log(`${filename} - ✅`);
+		return true;
+	} catch (err) {
+		console.log(`${filename} - ❌`);
+		return false;
+	}
+}
+
+
+function jsSyntaxCheck(file)
+{
+	try {
+		var filename = path.basename(file);
+		execSync(`node --check "${file}"`, { stdio: "inherit" }); // capture output
+		console.log(`${filename} - ✅`);
+		return true;
+	} catch (err) {
+		console.log(`${filename} - ❌`);
+		return false;
+	}
+}
+
+function tsSyntaxCheck(file) {
+    try {
+		var filename = path.basename(file);
+        execSync(`npx tsc --noEmit "${file}"`, { stdio: "inherit" });
+        console.log(`${filename} - ✅`);
+		return true;
+    } catch (err) {
+        // Get the full compiler output
+        console.log(`${filename} - ❌`);
+		return false;
+        
+    }
 }

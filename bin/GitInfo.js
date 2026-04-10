@@ -54,7 +54,7 @@ class GitInfo
 			if(commit.hash !== hash)
 			{
 				commit.files.forEach((file, index)=>{
-					if(this.match.call(null, file, includedPaths) == false) return;
+					if(includedPaths && this.match.call(null, file, includedPaths) == false) return;
 					if(map.hasOwnProperty(file))
 					{
 						return;

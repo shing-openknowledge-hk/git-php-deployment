@@ -143,6 +143,7 @@ if(options.action == "verify")
 		);
 		var localRoot = config.GIT.path;
 		if(info) fileSyntaxCheck(localRoot, info.changed);
+		return true;
 	});
 
 } else if(options.action == "deploy")

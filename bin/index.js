@@ -141,6 +141,7 @@ if(options.action == "verify")
 			config.SYNC,
 			latestHash
 		);
+		var localRoot = config.GIT.path;
 		if(info) fileSyntaxCheck(localRoot, info.changed);
 	});
 

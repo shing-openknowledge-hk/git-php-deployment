@@ -204,10 +204,10 @@ module.exports = class DeployTool{
 		if(!commits.length) return;
 		
 		commits.forEach((commit)=>{
-			console.log("█".repeat(80));
+			console.log("█".repeat(100));
 			this.logCommit(commit);
 		})
-		console.log("█".repeat(80));
+		console.log("█".repeat(100));
 	}
 
 	async zip(deploymentInfo, info, path)

@@ -28,14 +28,31 @@ class GitInfo
 		if(commits.length ) return commits[0];
 		return null;
 	}
+	async gitlog(gitOption)
+	{
+		if(!gitOption)
+		gitOption = {};
+		Object.assign(gitOption, {
+			repo: this.repo ? this.repo : __dirname ,
+			includeMergeCommitFiles:true
+		})
+		return await gitlog(gitOption);
+	}
+	
 	async getCommitInfo(option, includedPaths, hash = null)
 	{
 		var gitOption = {
-			// branch :"master",
 			repo: this.repo ? this.repo : __dirname ,
-			includeMergeCommitFiles:true
-			// execOptions: { maxBuffer: 1000 * 1024 },
-			// after:"2024-03-27 16:33:26 +0800"
+			includeMergeCommitFiles:true,
+			fields: [
+				"subject", 
+				"authorDate",
+				"authorName",
+				"authorEmail",
+				"committerDate",
+				"committerName",
+				"committerEmail",
+			]
 		};
 		if(option)
 		{
@@ -73,6 +90,7 @@ class GitInfo
 		});
 		var now = new Date().toISOString();
 		return {
+			commits:commits,
 			count:commits.length,
 			deleted:deletedFiles,
 			changed:changedFiles,

@@ -159,9 +159,55 @@ module.exports = class DeployTool{
 			}
 			
 		}
-		
+
+		this.logCommits(info.commits);
 		client.close();
 		return true;
+	}
+	logCommit(commit)
+	{
+		console.log("█");
+		if(commit.authorEmail === commit.committerEmail)
+		{
+			this.logMessage(`
+				Author: ${commit.authorName}(${commit.authorEmail})[${commit.authorDate}]
+			`);
+		} else {
+			this.logMessage(`
+				Author: ${commit.authorName}(${commit.authorEmail})[${commit.authorDate}]
+				Committer: ${commit.committerName}(${commit.committerEmail})[${commit.committerDate}]
+			`);
+		}
+		this.logMessage(
+			`Subject: ${commit.subject}`
+		);
+		console.log("█");
+	}
+	logMessage(message)
+	{
+		var txt = message.replace(/\r\n/, "\n").split("\n").map(
+			(line)=>{
+				var s = line.trim();
+				if(s)
+				{
+					return "█ " + line.trim();
+				} else {
+					return "";
+				}
+			}
+		).join("")
+		console.log(txt);
+	}
+
+	async logCommits(commits)
+	{
+		if(!commits.length) return;
+		
+		commits.forEach((commit)=>{
+			console.log("█".repeat(80));
+			this.logCommit(commit);
+		})
+		console.log("█".repeat(80));
 	}
 
 	async zip(deploymentInfo, info, path)
@@ -210,7 +256,6 @@ module.exports = class DeployTool{
 				});
 			}
 			
-			// console.log(err.code);
 			output = null;
 		}
 		await client.close();

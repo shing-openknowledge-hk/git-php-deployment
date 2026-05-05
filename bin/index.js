@@ -145,6 +145,28 @@ if(options.action == "verify")
 		if(info) fileSyntaxCheck(localRoot, info.changed);
 		return "Completed";
 	});
+} else if(options.action == "log")
+{
+	run(async ()=>{
+		var config = getConfig();
+		
+		var gitInfo = new GitInfo(config.GIT.path);
+		// var commits = await gitlog(gitOption);
+		var commits = await gitInfo.gitlog({
+			number: 3,
+			fields: [
+				"subject", 
+				"authorDate",
+				"authorName",
+				"authorEmail",
+				"committerDate",
+				"committerName",
+				"committerEmail",
+			]
+		});
+		tool.logCommits(commits);
+		return "";
+	});
 
 } else if(options.action == "deploy")
 {

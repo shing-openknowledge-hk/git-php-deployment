@@ -125,6 +125,7 @@ module.exports = class DeployTool{
 				var folder = folders[i];
 				console.log("\t+", folder);
 				await client.mkdir(folder);
+				await new Promise(resolve => setTimeout(resolve, 50));
 			}
 		}
 		// console.log("updating contents");
@@ -135,6 +136,7 @@ module.exports = class DeployTool{
 			var serverFile = "/"+file;
 			console.log("\t+", serverFile);
 			await client.upload(localFile, serverFile);
+			await new Promise(resolve => setTimeout(resolve, 50));
 		}
 		
 		for(var i = 0;i < info.deleted.length;i++)
@@ -144,6 +146,7 @@ module.exports = class DeployTool{
 			console.log("\t-", serverFile);
 			try{
 				await client.remove(serverFile);
+				await new Promise(resolve => setTimeout(resolve, 50));
 			} catch(err)
 			{
 				if(err.name == "Error" && err.code == 550)
